@@ -4,18 +4,56 @@ const firebase = require('firebase');
 exports.signUp = async (email, pass) => {
   console.log('creating user');
   const successVal = await firebase.auth().createUserWithEmailAndPassword(email, pass)
-    .catch((error) => {
-      const errorMessage = error.message;
-      return ({
-        status: 'failure',
-        message: errorMessage,
-      });
-    });
-    return successVal;
+    .then(() => ({
+      status: 'success',
+    }))
+    .catch((error) => ({
+      status: 'failure',
+      message: error.message,
+    }));
+  return successVal;
 };
 
-exports.sayHello = () => {
-  console.log('hello');
+exports.signIn = async (email, pass) => {
+  console.log('im signing in');
+  const successVal = await firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(() => ({
+      status: 'success',
+    }))
+    .catch((error) => ({
+      status: 'failure',
+      message: error.message,
+    }));
+  return successVal;
+};
+
+
+exports.signOut = async () => {
+  console.log('im signing out');
+  const successVal = await firebase.auth.signOut()
+    .then(() => ({
+      status: 'success',
+    })).catch((error) => ({
+      status: 'failure',
+      message: error.message,
+    }));
+  console.log(successVal);
+  return successVal;
+};
+
+exports.getCurrentUser = async () => {
+  const currUser = firebase.auth().currentUser;
+
+  if (currUser) {
+    return ({
+      status: 'success',
+      user: currUser,
+    });
+  }
+  return ({
+    status: 'failure',
+    message: 'no user signed in',
+  });
 };
 
 
