@@ -1,11 +1,9 @@
 // Firebase App (the core Firebase SDK) is always required and must be listed first
-import * as firebase from 'firebase/app';
+const firebase = require('firebase');
 
-// Add the Firebase products that you want to use
-import 'firebase/auth';
-
-exports.createUser = (email, pass) => {
-  firebase.auth().createUserWithEmailAndPassword(email, pass)
+exports.signUp = async (email, pass) => {
+  console.log('creating user');
+  const successVal = await firebase.auth().createUserWithEmailAndPassword(email, pass)
     .catch((error) => {
       const errorMessage = error.message;
       return ({
@@ -13,8 +11,18 @@ exports.createUser = (email, pass) => {
         message: errorMessage,
       });
     });
+    return successVal;
 };
 
 exports.sayHello = () => {
   console.log('hello');
 };
+
+
+// sign up
+// sign in
+// sign out
+// checked signed in
+// add todo for current user
+// mark todo for user as completed
+// change due date of todo
