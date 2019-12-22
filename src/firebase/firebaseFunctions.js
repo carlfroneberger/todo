@@ -53,7 +53,6 @@ exports.signOut = async () => {
 
 exports.getCurrentUser = async () => {
   const currUser = firebase.auth().currentUser;
-
   if (currUser) {
     return ({
       status: 'success',
@@ -66,18 +65,36 @@ exports.getCurrentUser = async () => {
   });
 };
 
-// exports.addTodo() = async () => {
-//   const currUser = firebase.auth().currentUser;
+exports.addTodo = async (todo, year, month, day) => {
+  const { uid } = (await firebase.auth().currentUser);
+  const userTodos = firebase.database().ref(`/users/${uid}/todos`);
+  const newTodo = await userTodos.push();
 
-//   console.log(currUser);
-// }
+  newTodo.set({
+    todo,
+    dueDate: `${year}-${month}-${day}`,
+    completed: false,
+  });
 
+  return newTodo.key;
+};
 
-// sign up
-// sign in
-// sign out
-// checked signed in
-// add todo for current user
-// mark todo for user as completed
-// change due date of todo
-// get todos
+exports.getTodos = async () => {
+  const { uid } = (await firebase.auth().currentUser);
+  return firebase.database().ref(`/users/${uid}/todos`).once('value')
+    .then(((snapshot) => {
+      console.log(snapshot.val());
+      return snapshot.val();
+    }));
+};
+
+exports.updateTodo = async (todoUid, todo, year, month, day, completed) => {
+  const { uid } = (await firebase.auth().currentUser);
+  console.log(uid);
+  const currTodo = firebase.database().ref(`/users/${uid}/todos/${todoUid}`);
+  currTodo.set({
+    todo,
+    dueDate: `${year}-${month}-${day}`,
+    completed,
+  });
+};
