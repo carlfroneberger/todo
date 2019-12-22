@@ -1,16 +1,26 @@
 // Firebase App (the core Firebase SDK) is always required and must be listed first
 const firebase = require('firebase');
 
-exports.signUp = async (email, pass) => {
+exports.signUp = async (email, pass, name) => {
   console.log('creating user');
   const successVal = await firebase.auth().createUserWithEmailAndPassword(email, pass)
-    .then(() => ({
+    .then((newUser) => ({
       status: 'success',
+      user: newUser,
     }))
     .catch((error) => ({
       status: 'failure',
       message: error.message,
     }));
+
+  if (successVal.status === 'success') {
+    const { uid } = successVal.user.user;
+    firebase.database().ref(`users/${uid}`).set({
+      name,
+      todos: [],
+    });
+  }
+  console.log(successVal);
   return successVal;
 };
 
@@ -56,6 +66,12 @@ exports.getCurrentUser = async () => {
   });
 };
 
+// exports.addTodo() = async () => {
+//   const currUser = firebase.auth().currentUser;
+
+//   console.log(currUser);
+// }
+
 
 // sign up
 // sign in
@@ -64,3 +80,4 @@ exports.getCurrentUser = async () => {
 // add todo for current user
 // mark todo for user as completed
 // change due date of todo
+// get todos

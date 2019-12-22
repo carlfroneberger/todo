@@ -7,14 +7,20 @@ function App() {
     <div className="App">
       <h1> Hello world</h1>
       <button onClick={
-        () => {firebase.signUp('duasdfmb@gmaiknkjkl.com', 'person')}
+        () => {firebase.signUp('tester@test.com', 'tester', 'Carl')}
       }>
         sign up test
       </button>
       <button onClick={
-        () => {firebase.signIn('dumb@gmaiknkjkl.com', 'sdkjlsdf')}
+        () => {firebase.signIn('test@test.com', 'test')}
       }>
         sign in test
+      </button>
+
+      <button onClick={
+        () => {console.log(firebase.getCurrentUser())}
+      }>
+        current user test in test
       </button>
     </div>
   );
