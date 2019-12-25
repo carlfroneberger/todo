@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import SignIn from './SignIn/SignIn';
 import SignUp from './SignUp/SignUp';
+import './SignInOrUp.css';
 
 class SignInOrUp extends Component {
     constructor(props) {
@@ -11,34 +12,29 @@ class SignInOrUp extends Component {
         }
     }
 
+    changeToSignUp = () => {
+        this.setState({
+            isSigningIn: false,
+        });
+    }
+
     render() {
         const { isSigningIn } = this.state;
         let body;
         if (isSigningIn) {
-            body = <SignIn />
+            body = <SignIn changeModalView={this.changeToSignUp}/>
         } else {
+            console.log('body is signing up');
             body = <SignUp />
         }
 
-
         return (
             <Modal
-                className='SignInOrUpModal'
-                dialogClassName='modal-90w'
+                dialogClassName='SignInOrUpModal'
+                show={true}
             >
                 { body }
-                {/* <Modal.Header>
-                    <Modal.Title>Modal title</Modal.Title>
-                </Modal.Header>
 
-                <Modal.Body>
-                    <p>Modal body text goes here.</p>
-                </Modal.Body>
-
-                <Modal.Footer>
-                    <Button variant="secondary">Close</Button>
-                    <Button variant="primary">Save changes</Button>
-                </Modal.Footer> */}
             </Modal>
         );
     }
