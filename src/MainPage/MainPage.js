@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import SignInOrUp from './SignInOrUp/SignInOrUp';
 const firebase = require('../firebase/firebaseFunctions');
 
 export class MainPage extends Component {
@@ -22,17 +23,9 @@ export class MainPage extends Component {
         this.setAuthenticationState();
         const { isAuthenticated } = this.state;
         if (isAuthenticated) {
-            return (
-                <h1>
-                    We're authenticated
-                </h1>
-            );
+            return <h1>We are authenticated</h1>
         }
-        return (
-            <h1>
-                We aren't authenticated;
-            </h1>
-        );
+        return <SignInOrUp />;
     }
 }
 
