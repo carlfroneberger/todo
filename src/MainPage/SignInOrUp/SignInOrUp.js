@@ -18,14 +18,19 @@ class SignInOrUp extends Component {
         });
     }
 
+    changeToSignIn = () => {
+        this.setState({
+            isSigningIn: true,
+        });
+    }
+
     render() {
         const { isSigningIn } = this.state;
         let body;
         if (isSigningIn) {
-            body = <SignIn changeModalView={this.changeToSignUp}/>
+            body = <SignIn changeModalView={this.changeToSignUp} />
         } else {
-            console.log('body is signing up');
-            body = <SignUp />
+            body = <SignUp changeModalView={this.changeToSignIn} />
         }
 
         return (
