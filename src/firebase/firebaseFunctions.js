@@ -1,6 +1,7 @@
 // Firebase App (the core Firebase SDK) is always required and must be listed first
 const firebase = require('firebase');
 
+// signs up a user with email, pass, and name
 exports.signUp = async (email, pass, name) => {
   console.log('creating user');
   const successVal = await firebase.auth().createUserWithEmailAndPassword(email, pass)
@@ -24,6 +25,7 @@ exports.signUp = async (email, pass, name) => {
   return successVal;
 };
 
+// signs in a user with email and pass
 exports.signIn = async (email, pass) => {
   console.log('im signing in');
   const successVal = await firebase.auth().signInWithEmailAndPassword(email, pass)
@@ -37,7 +39,7 @@ exports.signIn = async (email, pass) => {
   return successVal;
 };
 
-
+// signs out user
 exports.signOut = async () => {
   console.log('im signing out');
   const successVal = await firebase.auth.signOut()
@@ -51,6 +53,7 @@ exports.signOut = async () => {
   return successVal;
 };
 
+// gets object of current user if signed in
 exports.getCurrentUser = async () => {
   const currUser = firebase.auth().currentUser;
   if (currUser) {
@@ -65,6 +68,7 @@ exports.getCurrentUser = async () => {
   });
 };
 
+// adds a todo for the current user
 exports.addTodo = async (todo, year, month, day) => {
   const { uid } = (await firebase.auth().currentUser);
   const userTodos = firebase.database().ref(`/users/${uid}/todos`);
@@ -79,6 +83,7 @@ exports.addTodo = async (todo, year, month, day) => {
   return newTodo.key;
 };
 
+// gets the todos for the current user
 exports.getTodos = async () => {
   const { uid } = (await firebase.auth().currentUser);
   return firebase.database().ref(`/users/${uid}/todos`).once('value')
@@ -88,6 +93,7 @@ exports.getTodos = async () => {
     }));
 };
 
+// changes the todo for the current user
 exports.updateTodo = async (todoUid, todo, year, month, day, completed) => {
   const { uid } = (await firebase.auth().currentUser);
   console.log(uid);
