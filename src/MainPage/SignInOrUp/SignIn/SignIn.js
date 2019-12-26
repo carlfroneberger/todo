@@ -26,6 +26,11 @@ class SignIn extends Component {
         .then((res) => {
             if (res.status === 'success') {
                 onAuthenticate();
+            } else if (res.status === 'failure') {
+                this.setState({
+                    isError: true,
+                    errorMessage: res.message,
+                })
             }
             console.log(res);
         })
@@ -34,9 +39,9 @@ class SignIn extends Component {
     render() {
         const {isError, errorMessage} = this.state;
         const errorBar = (
-            <div>
-
-            </div>
+            <Alert variant='danger'>
+                Error signing in: {errorMessage}
+            </Alert>
         )
         
         const {changeModalView} = this.props;
@@ -45,6 +50,10 @@ class SignIn extends Component {
             textDecoration: 'underline',
         };
 
+        if (isError) {
+            console.log('there is an error');
+        }
+
         return (
             <div>
                 <Modal.Header>
@@ -52,6 +61,7 @@ class SignIn extends Component {
                 </Modal.Header>
 
                 <Modal.Body>
+                    {isError && errorBar}
                     <Form>
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
