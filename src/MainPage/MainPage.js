@@ -10,7 +10,7 @@ export class MainPage extends Component {
         }
     }
 
-    setAuthenticationState = async () => {
+    setInitialAuthenticationState = async () => {
         if (await firebase.getCurrentUser().status === 'success') {
             console.log('true');
             this.setState({isAuthenticated: true});
@@ -18,14 +18,22 @@ export class MainPage extends Component {
             console.log('false');
         }
     }
+
+    onAuthenticate = () => {
+        this.setState({
+            isAuthenticated: true,
+        })
+    }
+
+
     
     render() {
-        this.setAuthenticationState();
+        this.setInitialAuthenticationState();
         const { isAuthenticated } = this.state;
         if (isAuthenticated) {
             return <h1>We are authenticated</h1>
         }
-        return <SignInOrUp />;
+        return <SignInOrUp onAuthenticate={this.onAuthenticate} />;
     }
 }
 

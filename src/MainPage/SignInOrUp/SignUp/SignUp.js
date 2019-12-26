@@ -9,7 +9,8 @@ class SignUp extends Component {
         super(props);
 
         this.state = {
-            success: true,
+            isError: false,
+            errorMessage: '',
         }
     }
 
@@ -45,7 +46,7 @@ class SignUp extends Component {
                             <Form.Control type="password" placeholder="Enter password" />
                         </Form.Group>
                         <Button variant="primary" type="submit">
-                            Sign in
+                            Sign up
                         </Button>
                     </Form>
                 </Modal.Body>
@@ -64,6 +65,9 @@ class SignUp extends Component {
 SignUp.propTypes = {
     // Changes the modal view to sign in
     changeModalView: PropTypes.func.isRequired,
+
+    // Changes the web page to authenticated view
+    onAuthenticate: PropTypes.func.isRequired,
 }
 
 export default SignUp;

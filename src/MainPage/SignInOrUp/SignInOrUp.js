@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import SignIn from './SignIn/SignIn';
 import SignUp from './SignUp/SignUp';
+import PropTypes from 'prop-types';
 import './SignInOrUp.css';
 
 class SignInOrUp extends Component {
@@ -25,12 +26,19 @@ class SignInOrUp extends Component {
     }
 
     render() {
-        const { isSigningIn } = this.state;
+        const {isSigningIn} = this.state;
+        const {onAuthenticate} = this.props;
         let body;
         if (isSigningIn) {
-            body = <SignIn changeModalView={this.changeToSignUp} />
+            body = <SignIn
+                changeModalView={this.changeToSignUp}
+                onAuthenticate={onAuthenticate}
+            />
         } else {
-            body = <SignUp changeModalView={this.changeToSignIn} />
+            body = <SignUp
+                changeModalView={this.changeToSignIn}
+                onAuthenticate={onAuthenticate}
+            />
         }
 
         return (
@@ -43,6 +51,11 @@ class SignInOrUp extends Component {
             </Modal>
         );
     }
+}
+
+SignInOrUp.propTypes = {
+    // Changes the web page to authenticated view
+    onAuthenticate: PropTypes.func.isRequired,
 }
 
 export default SignInOrUp;
