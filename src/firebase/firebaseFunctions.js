@@ -21,7 +21,6 @@ exports.signUp = async (email, pass, name) => {
       todos: [],
     });
   }
-  console.log(successVal);
   return successVal;
 };
 
