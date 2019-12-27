@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './TodoPage.css';
 import firebase from '../../firebase/firebaseFunctions';
+import Sugar from 'sugar';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -9,22 +10,28 @@ class TodoPage extends Component {
         this.state = {
             name: '',
             todos: {},
+            today: '',
         }
 
-        // set name of user
+        // set name of user and current date
         firebase.getCurrentUser().then((res) => {
-            this.setState({name: res.name});
+            this.setState({
+                name: res.name,
+                today: Sugar.Date('today').format('%A, %B %e, %Y').raw,
+            });
         });
+
     }
     
     render() {
-        const {name} = this.state;
+        const {name, today} = this.state;
 
-        // console.log(Date.range('Tuesday from 1pm to 4pm').hours());
         return (
             <div>
                 <h1>Welcome, {name}</h1>
-                <h2>Today is: </h2>
+                <h2>Today is: {today}</h2>
+                {/* todo: make this white lol */}
+                <hr />
             </div>
         );
     }
