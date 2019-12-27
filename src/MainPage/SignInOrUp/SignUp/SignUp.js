@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
 import PropTypes from 'prop-types';
 import firebase from '../../../firebase/firebaseFunctions';
 
@@ -14,26 +15,49 @@ class SignUp extends Component {
         this.passRef = React.createRef();
 
         this.state = {
-            success: true,
+            isError: false,
+            errorMessage: '',
         }
     }
 
     handleButtonClick = () => {
+        const {handleAuthenticate} = this.props;
+        
         firebase.signUp(
             this.emailRef.current.value,
             this.passRef.current.value,
             this.nameRef.current.value
         ).then((res) => {
-            console.log(res);
+            if (res.status === 'success') {
+                this.setState({
+                    isError: false,
+                    errorMessage: '',
+                    
+                });
+                handleAuthenticate();
+            } else if (res.status === 'failure') {
+                this.setState({
+                    isError: true,
+                    errorMessage: res.message,
+                })
+            }
         });
     }
     
     render() {
+        const {isError, errorMessage} = this.state;
         const {changeModalView} = this.props;
+
         const linkLike = {
             color: 'blue',
             textDecoration: 'underline',
         };
+
+        const alertBox = (
+            <Alert variant='warning'>
+                {errorMessage}
+            </Alert>
+        )
 
         return (
             <div>
@@ -42,6 +66,7 @@ class SignUp extends Component {
                 </Modal.Header>
 
                 <Modal.Body>
+                    {isError && alertBox}
                     <Form>
                         <Form.Group controlId="formBasicName">
                             <Form.Label>Name</Form.Label>
@@ -77,6 +102,9 @@ class SignUp extends Component {
 SignUp.propTypes = {
     // Changes the modal view to sign in
     changeModalView: PropTypes.func.isRequired,
+
+    // Changes parent state when a user is authenticated
+    handleAuthenticate: PropTypes.func.isRequired,
 }
 
 export default SignUp;

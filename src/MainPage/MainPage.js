@@ -18,6 +18,12 @@ export class MainPage extends Component {
             console.log('false');
         }
     }
+
+    handleAuthenticate= () => {
+        this.setState({
+            isAuthenticated: true,
+        });
+    }
     
     render() {
         this.setAuthenticationState();
@@ -25,7 +31,7 @@ export class MainPage extends Component {
         if (isAuthenticated) {
             return <h1>We are authenticated</h1>
         }
-        return <SignInOrUp />;
+        return <SignInOrUp handleAuthenticate={this.handleAuthenticate} />;
     }
 }
 
