@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SignInOrUp from './SignInOrUp/SignInOrUp';
+import TodoPage from './TodoPage/TodoPage';
 const firebase = require('../firebase/firebaseFunctions');
 
 export class MainPage extends Component {
@@ -10,6 +11,7 @@ export class MainPage extends Component {
         }
     }
 
+    // If there is a user that is signed in, sets authentication state to true
     setAuthenticationState = async () => {
         if (await firebase.getCurrentUser().status === 'success') {
             console.log('true');
@@ -19,6 +21,8 @@ export class MainPage extends Component {
         }
     }
 
+    // Sets authentication state to true
+    // For use when user signs in or signs up
     handleAuthenticate= () => {
         this.setState({
             isAuthenticated: true,
@@ -29,7 +33,7 @@ export class MainPage extends Component {
         this.setAuthenticationState();
         const { isAuthenticated } = this.state;
         if (isAuthenticated) {
-            return <h1>We are authenticated</h1>
+            return <TodoPage />
         }
         return <SignInOrUp handleAuthenticate={this.handleAuthenticate} />;
     }

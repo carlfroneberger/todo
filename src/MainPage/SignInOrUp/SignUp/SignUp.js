@@ -10,16 +10,21 @@ class SignUp extends Component {
     constructor(props) {
         super(props);
         
+        // Refs to name, email, and pass fields
         this.nameRef = React.createRef();
         this.emailRef = React.createRef();
         this.passRef = React.createRef();
 
         this.state = {
+            // Controls when alert box is shown and its contents
             isError: false,
             errorMessage: '',
         }
     }
 
+    // If the sign up is successful, uses handleAuthenticate prop to propogate
+    // the authentication state upwards
+    // Otherwise, sets the state to display reason for failure
     handleButtonClick = () => {
         const {handleAuthenticate} = this.props;
         
@@ -48,11 +53,13 @@ class SignUp extends Component {
         const {isError, errorMessage} = this.state;
         const {changeModalView} = this.props;
 
+        // CSS styling to make text appear like a link
         const linkLike = {
             color: 'blue',
             textDecoration: 'underline',
         };
 
+        // Displays current error with account creation
         const alertBox = (
             <Alert variant='warning'>
                 {errorMessage}
@@ -80,6 +87,7 @@ class SignUp extends Component {
 
                         <Form.Group controlId="formBasicPassword">
                             <Form.Label>Password</Form.Label>
+                            {/* Todo: change to password */}
                             <Form.Control type="text" placeholder="Enter password" ref={this.passRef}/>
                         </Form.Group>
                         <Button variant="primary" onClick={this.handleButtonClick}>
