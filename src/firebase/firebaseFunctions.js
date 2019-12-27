@@ -53,6 +53,7 @@ exports.signOut = async () => {
 // gets object of current user if signed in
 exports.getCurrentUser = async () => {
   const currUser = firebase.auth().currentUser;
+
   if (currUser) {
     const currName = await firebase.database()
       .ref(`/users/${currUser.uid}/name`)
@@ -60,7 +61,7 @@ exports.getCurrentUser = async () => {
       .then((snapshot) => {
         return snapshot.val();
       });
-    console.log(currName);
+
     return ({
       status: 'success',
       name: currName,

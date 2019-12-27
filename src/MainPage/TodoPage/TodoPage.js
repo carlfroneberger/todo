@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './TodoPage.css';
-import Sugar from 'sugar-date';
 import firebase from '../../firebase/firebaseFunctions';
 
 class TodoPage extends Component {
@@ -20,10 +19,13 @@ class TodoPage extends Component {
     
     render() {
         const {name} = this.state;
-        const {today} = 
+
+        // console.log(Date.range('Tuesday from 1pm to 4pm').hours());
         return (
-        <h1>Welcome, {name}</h1>
-        <h2></h2>
+            <div>
+                <h1>Welcome, {name}</h1>
+                <h2>Today is: </h2>
+            </div>
         );
     }
 }
