@@ -25,7 +25,6 @@ exports.signUp = async (email, pass, name) => {
 
 // signs in a user with email and pass
 exports.signIn = async (email, pass) => {
-  console.log('im signing in');
   const successVal = await firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(() => ({
       status: 'success',
@@ -55,8 +54,16 @@ exports.signOut = async () => {
 exports.getCurrentUser = async () => {
   const currUser = firebase.auth().currentUser;
   if (currUser) {
+    const currName = await firebase.database()
+      .ref(`/users/${currUser.uid}/name`)
+      .once('value')
+      .then((snapshot) => {
+        return snapshot.val();
+      });
+    console.log(currName);
     return ({
       status: 'success',
+      name: currName,
       user: currUser,
     });
   }

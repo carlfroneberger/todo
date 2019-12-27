@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import './TodoPage.css';
+import firebase from '../../firebase/firebaseFunctions';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -8,13 +10,16 @@ class TodoPage extends Component {
             name: '',
             todos: {},
         }
+
+        firebase.getCurrentUser().then((res) => {
+            this.setState({name: res.name});
+        });
     }
     
     render() {
+        const {name} = this.state;
         return (
-            <div>
-                here are your todos:
-            </div>
+        <h1>Welcome, {name}, here are your todos: </h1>
         );
     }
 }
