@@ -3,7 +3,6 @@ const firebase = require('firebase');
 
 // signs up a user with email, pass, and name
 exports.signUp = async (email, pass, name) => {
-  console.log('creating user');
   const successVal = await firebase.auth().createUserWithEmailAndPassword(email, pass)
     .then((newUser) => ({
       status: 'success',
@@ -21,7 +20,6 @@ exports.signUp = async (email, pass, name) => {
       todos: [],
     });
   }
-  console.log(successVal);
   return successVal;
 };
 
