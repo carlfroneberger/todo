@@ -33,6 +33,7 @@ exports.signIn = async (email, pass) => {
       status: 'failure',
       message: error.message,
     }));
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
   return successVal;
 };
 
@@ -52,15 +53,17 @@ exports.signOut = async () => {
 
 // gets object of current user if signed in
 exports.getCurrentUser = async () => {
-  const currUser = firebase.auth().currentUser;
-
+  const currUser = await firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      return user;
+    }
+    return undefined;
+  });
   if (currUser) {
     const currName = await firebase.database()
       .ref(`/users/${currUser.uid}/name`)
       .once('value')
-      .then((snapshot) => {
-        return snapshot.val();
-      });
+      .then((snapshot) => snapshot.val());
 
     return ({
       status: 'success',

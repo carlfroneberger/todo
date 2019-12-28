@@ -87,8 +87,7 @@ class SignUp extends Component {
 
                         <Form.Group controlId="formBasicPassword">
                             <Form.Label>Password</Form.Label>
-                            {/* Todo: change to password */}
-                            <Form.Control type="text" placeholder="Enter password" ref={this.passRef}/>
+                            <Form.Control type="password" placeholder="Enter password" ref={this.passRef}/>
                         </Form.Group>
                         <Button variant="primary" onClick={this.handleButtonClick}>
                             Sign in
