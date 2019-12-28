@@ -13,12 +13,14 @@ class SignInOrUp extends Component {
         }
     }
 
+    // Changes modal view from sign in to sign up
     changeToSignUp = () => {
         this.setState({
             isSigningIn: false,
         });
     }
 
+    // Changes modal view from sign up to sign in
     changeToSignIn = () => {
         this.setState({
             isSigningIn: true,
