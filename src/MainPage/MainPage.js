@@ -13,11 +13,11 @@ export class MainPage extends Component {
 
     // If there is a user that is signed in, sets authentication state to true
     setAuthenticationState = async () => {
-        if (await firebase.getCurrentUser().status === 'success') {
-            console.log('true');
+        const user = await firebase.getCurrentUser();
+        if (user.status === 'success') {
             this.setState({isAuthenticated: true});
-        } else {
-            console.log('false');
+        } else if (user.status === 'failure') {
+            this.setState({isAuthenticated: false})
         }
     }
 

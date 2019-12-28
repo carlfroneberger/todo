@@ -45,6 +45,7 @@ class SignIn extends Component {
             }
         })
 
+
     }
     
     render() {
@@ -80,8 +81,7 @@ class SignIn extends Component {
 
                         <Form.Group controlId="formBasicPassword">
                             <Form.Label>Password</Form.Label>
-                            {/* Todo: change from text to password */}
-                            <Form.Control type="text" placeholder="Password" ref={this.passRef} />
+                            <Form.Control type="password" placeholder="Password" ref={this.passRef} />
                         </Form.Group>
                         <Button variant="primary" onClick={this.handleButtonClick}>
                             Sign in
