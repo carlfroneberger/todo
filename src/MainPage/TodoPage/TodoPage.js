@@ -14,7 +14,11 @@ class TodoPage extends Component {
             name: '',
             todos: {},
             today: '',
+            isNewTodoError: false,
+            newTodoErrorMessage: ''
         }
+
+        this.newTodoRef = React.createRef();
 
         // set name of user and current date
         firebase.getCurrentUser().then((res) => {
@@ -27,7 +31,30 @@ class TodoPage extends Component {
     }
 
     handleAddTodo = () => {
-        // well this is where it happens...
+        const parsed = this.newTodoRef.current.value
+        .split('//')
+        .map((elem) => {return elem.trim()});
+
+        if (parsed.length !== 2) {
+            this.setState({
+                isNewTodoError: true,
+                newTodoErrorMessage: 'Cannot parse to do',
+            })
+        }
+
+        const todo = parsed[0];
+        let dueDate;
+        try {
+            dueDate = Sugar.Date(parsed[1]);
+            console.log(dueDate.format().raw);
+        } catch {
+            this.setState({
+                isNewTodoError: true,
+                newTodoErrorMessage: 'Please enter a valid date',
+            });
+            return;
+        }
+
     }
     
     render() {
@@ -45,9 +72,15 @@ class TodoPage extends Component {
                     placeholder="What do you need to get done?"
                     aria-label="What do you need to get done?"
                     aria-describedby="basic-addon2"
+                    ref={this.newTodoRef}
                     />
                     <InputGroup.Append>
-                        <Button variant="outline-secondary">Add todo!</Button>
+                        <Button
+                        variant="outline-secondary"
+                        onClick={this.handleAddTodo}
+                        >
+                            Add todo!
+                        </Button>
                     </InputGroup.Append>
                 </InputGroup>
 
