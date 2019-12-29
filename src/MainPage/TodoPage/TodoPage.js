@@ -21,6 +21,7 @@ class TodoPage extends Component {
         this.newTodoRef = React.createRef();
 
         // set name of user and current date
+        // todo: this needs fixing
         firebase.getCurrentUser().then((res) => {
             this.setState({
                 name: res.name,
@@ -55,6 +56,12 @@ class TodoPage extends Component {
             return;
         }
 
+        const year = dueDate.format('%Y');
+        const month = dueDate.format('%m');
+        const day = dueDate.format('%d');
+
+        // to do: make this so that it adds the todo to list
+        firebase.addTodo(todo, year, month, day);
     }
     
     render() {
@@ -64,7 +71,6 @@ class TodoPage extends Component {
             <div>
                 <h1>Welcome, {name}</h1>
                 <h2>Today is: {today}</h2>
-                {/* todo: make this white lol */}
                 <hr />
 
                 <InputGroup className="mb-3">
