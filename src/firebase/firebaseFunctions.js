@@ -51,19 +51,27 @@ exports.signOut = async () => {
   return successVal;
 };
 
+exports.checkSignIn = (success, failure) => {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      console.log('there actually is a user');
+      success(user);
+    }
+    console.log('there isnt a user');
+    failure();
+  });
+};
+
 // gets object of current user if signed in
 exports.getCurrentUser = async () => {
-  const currUser = await firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      return user;
-    }
-    return undefined;
-  });
+  const currUser = firebase.auth().currentUser;
   if (currUser) {
     const currName = await firebase.database()
       .ref(`/users/${currUser.uid}/name`)
       .once('value')
-      .then((snapshot) => snapshot.val());
+      .then((snapshot) => {
+        return snapshot.val();
+      });
 
     return ({
       status: 'success',
