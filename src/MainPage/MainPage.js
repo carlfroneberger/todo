@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import SignInOrUp from './SignInOrUp/SignInOrUp';
 import TodoPage from './TodoPage/TodoPage';
-const firebase = require('../firebase/firebaseFunctions');
+import actualFirebase from 'firebase';
 
 export class MainPage extends Component {
     constructor(props) {
@@ -11,15 +11,22 @@ export class MainPage extends Component {
         }
     }
 
-    // If there is a user that is signed in, sets authentication state to true
-    setAuthenticationState = async () => {
-        const user = await firebase.getCurrentUser();
-        if (user.status === 'success') {
-            this.setState({isAuthenticated: true});
-        } else if (user.status === 'failure') {
-            this.setState({isAuthenticated: false})
-        }
+    componentDidMount() {
+        this.authFirebaseListener = actualFirebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({
+                    isAuthenticated: true,
+                });
+            }
+            this.setState({
+                isAuthenticate: false,
+            });
+        })
     }
+
+    componentWillUnmount() {
+        this.authFirebaseListener && this.authFirebaseListener() // Unlisten it by calling it as a function
+     };
 
     // Sets authentication state to true
     // For use when user signs in or signs up
@@ -30,7 +37,6 @@ export class MainPage extends Component {
     }
     
     render() {
-        this.setAuthenticationState();
         const { isAuthenticated } = this.state;
         if (isAuthenticated) {
             return <TodoPage />
