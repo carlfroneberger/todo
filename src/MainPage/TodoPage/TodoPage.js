@@ -5,6 +5,7 @@ import Sugar from 'sugar';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -62,17 +63,27 @@ class TodoPage extends Component {
 
         // to do: make this so that it adds the todo to list
         firebase.addTodo(todo, year, month, day);
+        this.setState({isNewTodoError: false});
+        this.newTodoRef.current.value = '';
     }
     
     render() {
-        const {name, today} = this.state;
+        const {name, today, isNewTodoError, newTodoErrorMessage} = this.state;
+
+        const alertBox = (
+            <Alert variant='warning'>
+                {newTodoErrorMessage}
+            </Alert>
+        )
+
+
 
         return (
             <div>
                 <h1>Welcome, {name}</h1>
                 <h2>Today is: {today}</h2>
                 <hr />
-
+                {isNewTodoError && alertBox}
                 <InputGroup className="mb-3">
                     <FormControl
                     placeholder="What do you need to get done?"
