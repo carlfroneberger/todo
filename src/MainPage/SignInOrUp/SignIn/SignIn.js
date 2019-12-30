@@ -28,8 +28,10 @@ class SignIn extends Component {
     // Otherwise, sets the error message for failure
     handleButtonClick = () => {
         const {handleAuthenticate} = this.props;
+        console.log('handled button click');
         firebase.signIn(this.emailRef.current.value, this.passRef.current.value)
         .then((res) => {
+            console.log(`here's res: ${res}`);
             if (res.status === 'success') {
                 this.setState({
                     isError: false,

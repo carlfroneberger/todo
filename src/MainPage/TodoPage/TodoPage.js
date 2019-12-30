@@ -5,6 +5,8 @@ import Sugar from 'sugar';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
+import Toast from 'react-bootstrap/Toast';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -15,7 +17,9 @@ class TodoPage extends Component {
             todos: {},
             today: '',
             isNewTodoError: false,
-            newTodoErrorMessage: ''
+            newTodoErrorMessage: '',
+            isTodoCreated: false,
+            todoCreatedMessage: ''
         }
 
         this.newTodoRef = React.createRef();
@@ -41,6 +45,7 @@ class TodoPage extends Component {
                 isNewTodoError: true,
                 newTodoErrorMessage: 'Cannot parse to do',
             })
+            return;
         }
 
         const todo = parsed[0];
@@ -62,23 +67,69 @@ class TodoPage extends Component {
 
         // to do: make this so that it adds the todo to list
         firebase.addTodo(todo, year, month, day);
+        console.log('do we get here');
+        this.setState({
+            isNewTodoError: false,
+            isTodoCreated: true,
+            todoCreatedMessage: `New to do created for ${dueDate.medium()}`});
+        this.newTodoRef.current.value = '';
+
     }
     
     render() {
-        const {name, today} = this.state;
+        const {name, today, isNewTodoError, newTodoErrorMessage,
+            isTodoCreated, todoCreatedMessage} = this.state;
+
+        const alertBox = (
+            <Alert variant='warning'>
+                {newTodoErrorMessage}
+            </Alert>
+        )
+
+        const todoToast = (
+            <Toast
+                onClose={() => {
+                this.setState({
+                    isTodoCreated: false,
+                    todoCreatedMessage: ''
+                });
+                }}
+                show={isTodoCreated}
+                delay={10000}
+                autohide
+                style={{
+                    textAlign: 'center',
+                    position: 'absolute',
+                    bottom: '10px',
+                    left: 0,
+                    right: 0,
+                    margin: '0 auto',
+
+                }}>
+                <Toast.Body>{todoCreatedMessage}</Toast.Body>
+          </Toast>
+        )
+
+
 
         return (
             <div>
                 <h1>Welcome, {name}</h1>
                 <h2>Today is: {today}</h2>
                 <hr />
-
+                {isNewTodoError && alertBox}
+                {isTodoCreated && todoToast}
                 <InputGroup className="mb-3">
                     <FormControl
                     placeholder="What do you need to get done?"
                     aria-label="What do you need to get done?"
                     aria-describedby="basic-addon2"
                     ref={this.newTodoRef}
+                    onKeyPress={(event) => {
+                        if (event.key === 'Enter') {
+                            this.handleAddTodo();
+                        }
+                    }}
                     />
                     <InputGroup.Append>
                         <Button
