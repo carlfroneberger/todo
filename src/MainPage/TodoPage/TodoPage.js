@@ -25,7 +25,6 @@ class TodoPage extends Component {
         this.newTodoRef = React.createRef();
 
         // set name of user and current date
-        // todo: this needs fixing
         firebase.getCurrentUser().then((res) => {
             this.setState({
                 name: res.name,
@@ -75,6 +74,36 @@ class TodoPage extends Component {
         this.newTodoRef.current.value = '';
 
     }
+
+    loadTodos = () => {
+        firebase.getTodos().then((todosObj) => {
+            // console.log(todosObj);
+            const todos = Object.values(todosObj);
+            console.log(todos);
+            console.log(typeof todos)
+
+            todos.sort((a, b) => {
+                const aParse = a.dueDate.split('-');
+                const bParse = b.dueDate.split('-');
+
+                if (aParse[0] > bParse[0]) {
+                    return 1;
+                } else if (aParse[0] < bParse[0]) {
+                    return -1;
+                }
+                else if (aParse[1] > bParse[1]) {
+                    return 1;
+                } else if (aParse[1] < bParse[1]) {
+                    return -1;
+                }
+                else if (aParse[2] > bParse[2]) {
+                    return 1;
+                } else if (aParse[2] < bParse[2]) {
+                    return -1;
+                }
+            })
+        });
+    }
     
     render() {
         const {name, today, isNewTodoError, newTodoErrorMessage,
@@ -110,7 +139,7 @@ class TodoPage extends Component {
           </Toast>
         )
 
-
+        this.loadTodos();
 
         return (
             <div>
