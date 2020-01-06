@@ -7,6 +7,9 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import Toast from 'react-bootstrap/Toast';
+import Card from 'react-bootstrap/Card';
+import TodoItem from './TodoItem/TodoItem';
+import { ListGroup } from 'react-bootstrap';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -14,7 +17,7 @@ class TodoPage extends Component {
 
         this.state = {
             name: '',
-            todos: {},
+            todos: [],
             today: '',
             isNewTodoError: false,
             newTodoErrorMessage: '',
@@ -31,6 +34,8 @@ class TodoPage extends Component {
                 today: Sugar.Date('today').format('%A, %B %e, %Y').raw,
             });
         });
+
+        this.loadTodos();
 
     }
 
@@ -66,7 +71,7 @@ class TodoPage extends Component {
 
         // to do: make this so that it adds the todo to list
         firebase.addTodo(todo, year, month, day);
-        console.log('do we get here');
+        this.loadTodos();
         this.setState({
             isNewTodoError: false,
             isTodoCreated: true,
@@ -77,10 +82,16 @@ class TodoPage extends Component {
 
     loadTodos = () => {
         firebase.getTodos().then((todosObj) => {
-            // console.log(todosObj);
+            const todosOther = Object.keys(todosObj).map((key, value) => {
+                let toReturn = todosObj[key];
+                toReturn[key] = key;
+                return toReturn;
+            });
+
+            console.log(todosOther);
+            
             const todos = Object.values(todosObj);
-            console.log(todos);
-            console.log(typeof todos)
+            console.log(todosObj);
 
             todos.sort((a, b) => {
                 const aParse = a.dueDate.split('-');
@@ -98,16 +109,28 @@ class TodoPage extends Component {
                 }
                 else if (aParse[2] > bParse[2]) {
                     return 1;
-                } else if (aParse[2] < bParse[2]) {
+                } else {
                     return -1;
                 }
-            })
+            });
+
+            let sortedTodos = [];
+            todos.forEach((elem) => {
+                if (sortedTodos.length === 0) {
+                    sortedTodos.push([elem]);
+                } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
+                    sortedTodos[sortedTodos.length - 1].push(elem);
+                } else {
+                    sortedTodos.push([elem]);
+                }
+            });
+            this.setState({todos: sortedTodos});
         });
     }
     
     render() {
         const {name, today, isNewTodoError, newTodoErrorMessage,
-            isTodoCreated, todoCreatedMessage} = this.state;
+            isTodoCreated, todoCreatedMessage, todos} = this.state;
 
         const alertBox = (
             <Alert variant='warning'>
@@ -139,8 +162,6 @@ class TodoPage extends Component {
           </Toast>
         )
 
-        this.loadTodos();
-
         return (
             <div>
                 <h1>Welcome, {name}</h1>
@@ -170,9 +191,33 @@ class TodoPage extends Component {
                     </InputGroup.Append>
                 </InputGroup>
 
+                {todos.map((dateTodos) => {
+                    return (
+                        <Card style={{width: '600px'}}>
+                            <Card.Header>{dateTodos[0].dueDate}</Card.Header>
+                            {dateTodos.map((todoIter) => {
+                                return (
+                                    <TodoItem
+                                        completed={todoIter.completed}
+                                        todoText={todoIter.todo}
+                                        id={todoIter.key}
+                                        key={todoIter.key}
+                                    />
+                                )
+                            })}
+                        </Card>
+                    )
+                })}
 
+
+                <Card style={{width: '600px'}}>
+                    <Card.Header>Today</Card.Header>
+                    <ListGroup variant="flush">
+                        <TodoItem completed={false} todoText="your first todo ok but now i need to see how it looks when there is just wayyyy too much text" id="7880fdsaf9a80sdf" />
+                        <TodoItem completed={false} todoText="hello there hope all is well" id="sccooby doo" />
+                    </ListGroup>
+                </Card>
             </div>
-
         );
     }
 }

@@ -105,7 +105,6 @@ exports.getTodos = async () => {
   const { uid } = (await firebase.auth().currentUser);
   return firebase.database().ref(`/users/${uid}/todos`).once('value')
     .then(((snapshot) => {
-      console.log(snapshot.val());
       return snapshot.val();
     }));
 };
