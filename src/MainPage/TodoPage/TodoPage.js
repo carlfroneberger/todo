@@ -81,51 +81,56 @@ class TodoPage extends Component {
     }
 
     loadTodos = () => {
-        firebase.getTodos().then((todosObj) => {
-            const todosOther = Object.keys(todosObj).map((key, value) => {
-                let toReturn = todosObj[key];
-                toReturn[key] = key;
-                return toReturn;
+            firebase.getTodos().then((todosObj) => {
+                if (todosObj === null) {
+                    this.setState({todos: []});
+                    return;
+                }
+                console.log(todosObj);
+                const todosOther = Object.keys(todosObj).map((key, value) => {
+                    let toReturn = todosObj[key];
+                    toReturn['id'] = key;
+                    return toReturn;
+                });
+
+                console.log(todosOther);
+                
+                const todos = Object.values(todosObj);
+                console.log(todosObj);
+
+                todos.sort((a, b) => {
+                    const aParse = a.dueDate.split('-');
+                    const bParse = b.dueDate.split('-');
+
+                    if (aParse[0] > bParse[0]) {
+                        return 1;
+                    } else if (aParse[0] < bParse[0]) {
+                        return -1;
+                    }
+                    else if (aParse[1] > bParse[1]) {
+                        return 1;
+                    } else if (aParse[1] < bParse[1]) {
+                        return -1;
+                    }
+                    else if (aParse[2] > bParse[2]) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                });
+
+                let sortedTodos = [];
+                todos.forEach((elem) => {
+                    if (sortedTodos.length === 0) {
+                        sortedTodos.push([elem]);
+                    } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
+                        sortedTodos[sortedTodos.length - 1].push(elem);
+                    } else {
+                        sortedTodos.push([elem]);
+                    }
+                });
+                this.setState({todos: sortedTodos});
             });
-
-            console.log(todosOther);
-            
-            const todos = Object.values(todosObj);
-            console.log(todosObj);
-
-            todos.sort((a, b) => {
-                const aParse = a.dueDate.split('-');
-                const bParse = b.dueDate.split('-');
-
-                if (aParse[0] > bParse[0]) {
-                    return 1;
-                } else if (aParse[0] < bParse[0]) {
-                    return -1;
-                }
-                else if (aParse[1] > bParse[1]) {
-                    return 1;
-                } else if (aParse[1] < bParse[1]) {
-                    return -1;
-                }
-                else if (aParse[2] > bParse[2]) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            });
-
-            let sortedTodos = [];
-            todos.forEach((elem) => {
-                if (sortedTodos.length === 0) {
-                    sortedTodos.push([elem]);
-                } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
-                    sortedTodos[sortedTodos.length - 1].push(elem);
-                } else {
-                    sortedTodos.push([elem]);
-                }
-            });
-            this.setState({todos: sortedTodos});
-        });
     }
     
     render() {
@@ -196,27 +201,20 @@ class TodoPage extends Component {
                         <Card style={{width: '600px'}}>
                             <Card.Header>{dateTodos[0].dueDate}</Card.Header>
                             {dateTodos.map((todoIter) => {
+                                console.log(todoIter);
                                 return (
                                     <TodoItem
                                         completed={todoIter.completed}
                                         todoText={todoIter.todo}
-                                        id={todoIter.key}
-                                        key={todoIter.key}
+                                        dueDate={todoIter.dueDate}
+                                        id={todoIter.id}
+                                        key={todoIter.id}
                                     />
                                 )
                             })}
                         </Card>
                     )
                 })}
-
-
-                <Card style={{width: '600px'}}>
-                    <Card.Header>Today</Card.Header>
-                    <ListGroup variant="flush">
-                        <TodoItem completed={false} todoText="your first todo ok but now i need to see how it looks when there is just wayyyy too much text" id="7880fdsaf9a80sdf" />
-                        <TodoItem completed={false} todoText="hello there hope all is well" id="sccooby doo" />
-                    </ListGroup>
-                </Card>
             </div>
         );
     }

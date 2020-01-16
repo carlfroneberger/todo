@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 // import Card from 'react-bootstrap/Card';
 import { ListGroup } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
+import firebase from '../../../firebase/firebaseFunctions';
 
 
 
@@ -9,23 +10,25 @@ import Form from 'react-bootstrap/Form';
 class TodoItem extends Component {
     constructor(props) {
         super(props);
-        const {key, id, todoText, completed} = this.props;
+        const {id, todoText, completed, dueDate} = this.props;
         this.state = {
             id,
             todoText,
             completed,
+            dueDate
         };
 
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange = () => {
-        console.log(this.state.todoText);
-        const {completed} = this.state;
-        console.log('i am changing state');
+        const {id, todoText, completed, dueDate} = this.state;
         this.setState({
             completed: !completed,
         });
+        const parsed = dueDate.split('-');
+        console.log(id);
+        firebase.updateTodo(id, todoText, parsed[0], parsed[1], parsed[2], !completed);
     }
     
     render() {
