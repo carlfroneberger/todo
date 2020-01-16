@@ -2,7 +2,7 @@
 const firebase = require('firebase');
 
 // signs up a user with email, pass, and name
-exports.signUp = async (email, pass, name) => {
+export const signUp = async (email, pass, name) => {
   const successVal = await firebase.auth().createUserWithEmailAndPassword(email, pass)
     .then((newUser) => ({
       status: 'success',
@@ -24,7 +24,7 @@ exports.signUp = async (email, pass, name) => {
 };
 
 // signs in a user with email and pass
-exports.signIn = async (email, pass) => {
+export const signIn = async (email, pass) => {
   const successVal = await firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(() => ({
       status: 'success',
@@ -38,7 +38,7 @@ exports.signIn = async (email, pass) => {
 };
 
 // signs out user
-exports.signOut = async () => {
+export const signOut = async () => {
   console.log('im signing out');
   const successVal = await firebase.auth.signOut()
     .then(() => ({
@@ -51,7 +51,7 @@ exports.signOut = async () => {
   return successVal;
 };
 
-exports.checkSignIn = (success, failure) => {
+export const checkSignIn = (success, failure) => {
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       console.log('there actually is a user');
@@ -63,7 +63,7 @@ exports.checkSignIn = (success, failure) => {
 };
 
 // gets object of current user if signed in
-exports.getCurrentUser = async () => {
+export const getCurrentUser = async () => {
   const currUser = firebase.auth().currentUser;
   if (currUser) {
     const currName = await firebase.database()
@@ -86,7 +86,7 @@ exports.getCurrentUser = async () => {
 };
 
 // adds a todo for the current user
-exports.addTodo = async (todo, year, month, day) => {
+export const addTodo = async (todo, year, month, day) => {
   const { uid } = (await firebase.auth().currentUser);
   const userTodos = firebase.database().ref(`/users/${uid}/todos`);
   const newTodo = await userTodos.push();
@@ -101,7 +101,7 @@ exports.addTodo = async (todo, year, month, day) => {
 };
 
 // gets the todos for the current user
-exports.getTodos = async () => {
+export const getTodos = async () => {
   const { uid } = (await firebase.auth().currentUser);
   return firebase.database().ref(`/users/${uid}/todos`).once('value')
     .then(((snapshot) => {
@@ -110,7 +110,7 @@ exports.getTodos = async () => {
 };
 
 // changes the todo for the current user
-exports.updateTodo = async (todoUid, todo, year, month, day, completed) => {
+export const updateTodo = async (todoUid, todo, year, month, day, completed) => {
   const { uid } = (await firebase.auth().currentUser);
   console.log(uid);
   const currTodo = firebase.database().ref(`/users/${uid}/todos/${todoUid}`);
