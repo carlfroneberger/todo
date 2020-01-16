@@ -7,6 +7,9 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import Toast from 'react-bootstrap/Toast';
+import Card from 'react-bootstrap/Card';
+import TodoItem from './TodoItem/TodoItem';
+import { ListGroup } from 'react-bootstrap';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -14,7 +17,7 @@ class TodoPage extends Component {
 
         this.state = {
             name: '',
-            todos: {},
+            todos: [],
             today: '',
             isNewTodoError: false,
             newTodoErrorMessage: '',
@@ -25,13 +28,14 @@ class TodoPage extends Component {
         this.newTodoRef = React.createRef();
 
         // set name of user and current date
-        // todo: this needs fixing
         firebase.getCurrentUser().then((res) => {
             this.setState({
                 name: res.name,
                 today: Sugar.Date('today').format('%A, %B %e, %Y').raw,
             });
         });
+
+        this.loadTodos();
 
     }
 
@@ -67,7 +71,7 @@ class TodoPage extends Component {
 
         // to do: make this so that it adds the todo to list
         firebase.addTodo(todo, year, month, day);
-        console.log('do we get here');
+        this.loadTodos();
         this.setState({
             isNewTodoError: false,
             isTodoCreated: true,
@@ -75,10 +79,63 @@ class TodoPage extends Component {
         this.newTodoRef.current.value = '';
 
     }
+
+    loadTodos = () => {
+            firebase.getTodos().then((todosObj) => {
+                if (todosObj === null) {
+                    this.setState({todos: []});
+                    return;
+                }
+                console.log(todosObj);
+                const todosOther = Object.keys(todosObj).map((key, value) => {
+                    let toReturn = todosObj[key];
+                    toReturn['id'] = key;
+                    return toReturn;
+                });
+
+                console.log(todosOther);
+                
+                const todos = Object.values(todosObj);
+                console.log(todosObj);
+
+                todos.sort((a, b) => {
+                    const aParse = a.dueDate.split('-');
+                    const bParse = b.dueDate.split('-');
+
+                    if (aParse[0] > bParse[0]) {
+                        return 1;
+                    } else if (aParse[0] < bParse[0]) {
+                        return -1;
+                    }
+                    else if (aParse[1] > bParse[1]) {
+                        return 1;
+                    } else if (aParse[1] < bParse[1]) {
+                        return -1;
+                    }
+                    else if (aParse[2] > bParse[2]) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                });
+
+                let sortedTodos = [];
+                todos.forEach((elem) => {
+                    if (sortedTodos.length === 0) {
+                        sortedTodos.push([elem]);
+                    } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
+                        sortedTodos[sortedTodos.length - 1].push(elem);
+                    } else {
+                        sortedTodos.push([elem]);
+                    }
+                });
+                this.setState({todos: sortedTodos});
+            });
+    }
     
     render() {
         const {name, today, isNewTodoError, newTodoErrorMessage,
-            isTodoCreated, todoCreatedMessage} = this.state;
+            isTodoCreated, todoCreatedMessage, todos} = this.state;
 
         const alertBox = (
             <Alert variant='warning'>
@@ -110,8 +167,6 @@ class TodoPage extends Component {
           </Toast>
         )
 
-
-
         return (
             <div>
                 <h1>Welcome, {name}</h1>
@@ -141,9 +196,26 @@ class TodoPage extends Component {
                     </InputGroup.Append>
                 </InputGroup>
 
-
+                {todos.map((dateTodos) => {
+                    return (
+                        <Card style={{width: '600px'}}>
+                            <Card.Header>{dateTodos[0].dueDate}</Card.Header>
+                            {dateTodos.map((todoIter) => {
+                                console.log(todoIter);
+                                return (
+                                    <TodoItem
+                                        completed={todoIter.completed}
+                                        todoText={todoIter.todo}
+                                        dueDate={todoIter.dueDate}
+                                        id={todoIter.id}
+                                        key={todoIter.id}
+                                    />
+                                )
+                            })}
+                        </Card>
+                    )
+                })}
             </div>
-
         );
     }
 }
