@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 import PropTypes from 'prop-types';
-import firebase from '../../../firebase/firebaseFunctions';
+import * as firebase from '../../../firebase/firebaseFunctions';
 
 class SignUp extends Component {
     constructor(props) {
