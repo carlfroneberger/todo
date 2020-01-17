@@ -18,6 +18,7 @@ class TodoPage extends Component {
         this.state = {
             name: '',
             todos: [],
+            overdueTodos: [],
             today: '',
             isNewTodoError: false,
             newTodoErrorMessage: '',
@@ -81,6 +82,7 @@ class TodoPage extends Component {
     }
 
     loadTodos = () => {
+        console.log('reloading todos');
             firebase.getTodos().then((todosObj) => {
                 if (todosObj === null) {
                     this.setState({todos: []});
@@ -120,8 +122,20 @@ class TodoPage extends Component {
                 });
 
                 let sortedTodos = [];
+                let overdueTodos = [];
+                let currDate = new Date();
+                currDate.setHours(0,0,0,0);
+                currDate.setDate(currDate.getDate() - 1);
+
                 todos.forEach((elem) => {
-                    if (sortedTodos.length === 0) {
+                    let elemDate = new Date(elem.dueDate);
+                    elemDate.setHours(0,0,0,0);
+                    if (currDate > elemDate) {
+                        if (!elem.completed) {
+                            overdueTodos.push(elem);
+                        }
+                    }
+                    else if (sortedTodos.length === 0) {
                         sortedTodos.push([elem]);
                     } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
                         sortedTodos[sortedTodos.length - 1].push(elem);
@@ -129,13 +143,18 @@ class TodoPage extends Component {
                         sortedTodos.push([elem]);
                     }
                 });
-                this.setState({todos: sortedTodos});
+
+                this.setState({
+                    todos: sortedTodos,
+                    overdueTodos,
+                });
             });
+
     }
     
     render() {
         const {name, today, isNewTodoError, newTodoErrorMessage,
-            isTodoCreated, todoCreatedMessage, todos} = this.state;
+            isTodoCreated, todoCreatedMessage, todos, overdueTodos} = this.state;
 
         const alertBox = (
             <Alert variant='warning'>
@@ -196,12 +215,30 @@ class TodoPage extends Component {
                     </InputGroup.Append>
                 </InputGroup>
 
+                {
+                    (overdueTodos.length !== 0) &&
+                    <Card style={{width: '600px'}} bg='danger' text='white'>
+                        <Card.Header>Overdue</Card.Header>
+                        {overdueTodos.map((todoIter) => {
+                            return (
+                                <TodoItem
+                                    completed={todoIter.completed}
+                                    todoText={todoIter.todo}
+                                    dueDate={todoIter.dueDate}
+                                    id={todoIter.id}
+                                    key={todoIter.id}
+                                    onChange={this.loadTodos}
+                                />
+                            )
+                        })}
+                    </Card>
+                }
+
                 {todos.map((dateTodos) => {
                     return (
                         <Card style={{width: '600px'}}>
                             <Card.Header>{dateTodos[0].dueDate}</Card.Header>
                             {dateTodos.map((todoIter) => {
-                                console.log(todoIter);
                                 return (
                                     <TodoItem
                                         completed={todoIter.completed}
@@ -209,6 +246,7 @@ class TodoPage extends Component {
                                         dueDate={todoIter.dueDate}
                                         id={todoIter.id}
                                         key={todoIter.id}
+                                        onChange={this.loadTodos}
                                     />
                                 )
                             })}

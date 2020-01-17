@@ -22,6 +22,7 @@ class TodoItem extends Component {
     }
 
     handleChange = () => {
+        const {onChange} = this.props;
         const {id, todoText, completed, dueDate} = this.state;
         this.setState({
             completed: !completed,
@@ -29,6 +30,7 @@ class TodoItem extends Component {
         const parsed = dueDate.split('-');
         console.log(id);
         firebase.updateTodo(id, todoText, parsed[0], parsed[1], parsed[2], !completed);
+        onChange();
     }
     
     render() {
