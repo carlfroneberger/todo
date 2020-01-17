@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // import Card from 'react-bootstrap/Card';
 import { ListGroup } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
-import firebase from '../../../firebase/firebaseFunctions';
+import * as firebase from '../../../firebase/firebaseFunctions';
 
 
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './TodoPage.css';
-import firebase from '../../firebase/firebaseFunctions';
+import * as firebase from '../../firebase/firebaseFunctions';
 import Sugar from 'sugar';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
