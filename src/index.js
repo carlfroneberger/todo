@@ -16,11 +16,9 @@ let firebaseConfig = {
     measurementId: 'G-8YGSLG05W5',
   };
 
-firebaseConfig.apiKey = process.env.REACT_APP_API;
+firebaseConfig.apiKey = 'AIzaSyAUZgz2rm1IeYgk9Q2ws3uq0vYiH8E5HJM';
 
 firebase.initializeApp(firebaseConfig);
-console.log(firebaseConfig);
-console.log(process.env.REACT_APP_API);
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
