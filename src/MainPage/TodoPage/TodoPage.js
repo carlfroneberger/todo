@@ -140,6 +140,18 @@ class TodoPage extends Component {
             });
 
     }
+
+    makePrettyDate = (date) => {
+        let currDate = Sugar.Date(date);
+        if (currDate.is('today').raw) {
+            return 'Today';
+        } else if (currDate.is('tomorrow').raw) {
+            return 'Tomorrow';
+        } else {
+            return currDate.format('%A %B %d, %Y').raw;
+        }
+
+    }
     
     render() {
         const {name, today, isNewTodoError, newTodoErrorMessage,
@@ -241,7 +253,9 @@ class TodoPage extends Component {
                     return (
                         <div>
                             <Card style={{width: '600px'}}>
-                                <Card.Header>{dateTodos[0].dueDate}</Card.Header>
+                                <Card.Header>
+                                    {this.makePrettyDate(dateTodos[0].dueDate)}
+                                </Card.Header>
                                 {dateTodos.map((todoIter) => {
                                     return (
                                         <TodoItem
