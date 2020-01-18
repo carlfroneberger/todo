@@ -100,27 +100,29 @@ class TodoPage extends Component {
                 const todos = Object.values(todosObj);
                 console.log(todosObj);
 
-                todos.sort((a, b) => {
-                    const aParse = a.dueDate.split('-');
-                    const bParse = b.dueDate.split('-');
+                // todos.sort((a, b) => {
+                //     const aParse = a.dueDate.split('-');
+                //     const bParse = b.dueDate.split('-');
 
-                    if (aParse[0] > bParse[0]) {
-                        return 1;
-                    } else if (aParse[0] < bParse[0]) {
-                        return -1;
-                    }
-                    else if (aParse[1] > bParse[1]) {
-                        return 1;
-                    } else if (aParse[1] < bParse[1]) {
-                        return -1;
-                    }
-                    else if (aParse[2] > bParse[2]) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                });
+                //     if (aParse[0] > bParse[0]) {
+                //         return 1;
+                //     } else if (aParse[0] < bParse[0]) {
+                //         return -1;
+                //     }
+                //     else if (aParse[1] > bParse[1]) {
+                //         return 1;
+                //     } else if (aParse[1] < bParse[1]) {
+                //         return -1;
+                //     }
+                //     else if (aParse[2] > bParse[2]) {
+                //         return 1;
+                //     } else {
+                //         return -1;
+                //     }
+                // });
 
+                let displayTodos = {};
+                
                 let sortedTodos = [];
                 let overdueTodos = [];
                 let currDate = new Date();
@@ -135,17 +137,24 @@ class TodoPage extends Component {
                             overdueTodos.push(elem);
                         }
                     }
-                    else if (sortedTodos.length === 0) {
-                        sortedTodos.push([elem]);
-                    } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
-                        sortedTodos[sortedTodos.length - 1].push(elem);
+
+                    else if (!(elem.dueDate in displayTodos)) {
+                        displayTodos[elem.dueDate] = [elem];
                     } else {
-                        sortedTodos.push([elem]);
+                        displayTodos[elem.dueDate].push(elem);
                     }
+
+                    // else if (sortedTodos.length === 0) {
+                    //     sortedTodos.push([elem]);
+                    // } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
+                    //     sortedTodos[sortedTodos.length - 1].push(elem);
+                    // } else {
+                    //     sortedTodos.push([elem]);
+                    // }
                 });
 
                 this.setState({
-                    todos: sortedTodos,
+                    todos: displayTodos,
                     overdueTodos,
                 });
             });
@@ -185,6 +194,15 @@ class TodoPage extends Component {
                 <Toast.Body>{todoCreatedMessage}</Toast.Body>
           </Toast>
         )
+
+        let days = [];
+        var currDate = new Date();
+        currDate.setHours(0, 0, 0, 0);
+        for (let i = 0; i < 14; i++) {
+            days.push(currDate.toISOString().split('T')[0]);
+            currDate.setDate(currDate.getDate() + 1);
+        }
+        console.log(days);
 
         return (
             <div>
@@ -234,7 +252,63 @@ class TodoPage extends Component {
                     </Card>
                 }
 
-                {todos.map((dateTodos) => {
+                {
+                    days.map((day) => {
+                        console.log('in day');
+                        return (
+                            <Card style={{width: '600px'}}>
+                                <Card.Header>{day}</Card.Header>
+                                <ListGroup.Item>
+                                {todos[day] && todos[day].map((todo) => {
+                                    return (
+                                        <TodoItem
+                                            completed={todo.completed}
+                                            todoText={todo.todo}
+                                            dueDate={todo.dueDate}
+                                            id={todo.id}
+                                            key={todo.id}
+                                            onChange={this.loadTodos}
+                                        />
+                                    );
+                                })}
+
+
+                                <InputGroup className="mb-3">
+                                    <FormControl
+                                    placeholder="What do you need to get done?"
+                                    aria-label="What do you need to get done?"
+                                    aria-describedby="basic-addon2"
+                                    ref={this.newTodoRef}
+                                    onKeyPress={(event) => {
+                                        if (event.key === 'Enter') {
+                                            this.handleAddTodo();
+                                        }
+                                    }}
+                                    />
+                                    <InputGroup.Append>
+                                        <Button
+                                        variant="outline-secondary"
+                                        onClick={this.handleAddTodo}
+                                        >
+                                            Add todo!
+                                        </Button>
+                                    </InputGroup.Append>
+                                </InputGroup>
+
+
+
+                                    
+                                </ListGroup.Item>
+                                {/* <ListGroup className="list-group-flush">
+                                    <ListGroup.Item>Cras justo odio</ListGroupItem>
+                                    <ListGroup.Item>Dapibus ac facilisis in</ListGroupItem>
+                                    <ListGroup.Item>Vestibulum at eros</ListGroupItem>
+                                </ListGroup> */}
+                            </Card>
+                        )
+                    })
+                }
+                {/* {todos.map((dateTodos) => {
                     return (
                         <Card style={{width: '600px'}}>
                             <Card.Header>{dateTodos[0].dueDate}</Card.Header>
@@ -252,7 +326,7 @@ class TodoPage extends Component {
                             })}
                         </Card>
                     )
-                })}
+                })} */}
             </div>
         );
     }
