@@ -9,7 +9,7 @@ import Alert from 'react-bootstrap/Alert';
 import Toast from 'react-bootstrap/Toast';
 import Card from 'react-bootstrap/Card';
 import TodoItem from './TodoItem/TodoItem';
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup, Form } from 'react-bootstrap';
 
 class TodoPage extends Component {
     constructor(props) {
@@ -18,6 +18,7 @@ class TodoPage extends Component {
         this.state = {
             name: '',
             todos: [],
+            overdueTodos: [],
             today: '',
             isNewTodoError: false,
             newTodoErrorMessage: '',
@@ -26,6 +27,7 @@ class TodoPage extends Component {
         }
 
         this.newTodoRef = React.createRef();
+        this.newDateRef = React.createRef();
 
         // set name of user and current date
         firebase.getCurrentUser().then((res) => {
@@ -40,23 +42,10 @@ class TodoPage extends Component {
     }
 
     handleAddTodo = () => {
-        const parsed = this.newTodoRef.current.value
-        .split('//')
-        .map((elem) => {return elem.trim()});
-
-        if (parsed.length !== 2) {
-            this.setState({
-                isNewTodoError: true,
-                newTodoErrorMessage: 'Cannot parse to do',
-            })
-            return;
-        }
-
-        const todo = parsed[0];
+        const todo = this.newTodoRef.current.value;
         let dueDate;
         try {
-            dueDate = Sugar.Date(parsed[1]);
-            console.log(dueDate.format().raw);
+            dueDate = Sugar.Date(this.newDateRef.current.value);
         } catch {
             this.setState({
                 isNewTodoError: true,
@@ -77,10 +66,12 @@ class TodoPage extends Component {
             isTodoCreated: true,
             todoCreatedMessage: `New to do created for ${dueDate.medium()}`});
         this.newTodoRef.current.value = '';
+        this.newDateRef.current.value = '';
 
     }
 
     loadTodos = () => {
+        console.log('reloading todos');
             firebase.getTodos().then((todosObj) => {
                 if (todosObj === null) {
                     this.setState({todos: []});
@@ -120,8 +111,20 @@ class TodoPage extends Component {
                 });
 
                 let sortedTodos = [];
+                let overdueTodos = [];
+                let currDate = new Date();
+                currDate.setHours(0,0,0,0);
+                currDate.setDate(currDate.getDate() - 1);
+
                 todos.forEach((elem) => {
-                    if (sortedTodos.length === 0) {
+                    let elemDate = new Date(elem.dueDate);
+                    elemDate.setHours(0,0,0,0);
+                    if (currDate > elemDate) {
+                        if (!elem.completed) {
+                            overdueTodos.push(elem);
+                        }
+                    }
+                    else if (sortedTodos.length === 0) {
                         sortedTodos.push([elem]);
                     } else if (sortedTodos[sortedTodos.length -1][0].dueDate === elem.dueDate) {
                         sortedTodos[sortedTodos.length - 1].push(elem);
@@ -129,13 +132,30 @@ class TodoPage extends Component {
                         sortedTodos.push([elem]);
                     }
                 });
-                this.setState({todos: sortedTodos});
+
+                this.setState({
+                    todos: sortedTodos,
+                    overdueTodos,
+                });
             });
+
+    }
+
+    makePrettyDate = (date) => {
+        let currDate = Sugar.Date(date);
+        if (currDate.is('today').raw) {
+            return 'Today';
+        } else if (currDate.is('tomorrow').raw) {
+            return 'Tomorrow';
+        } else {
+            return currDate.format('%A %B %d, %Y').raw;
+        }
+
     }
     
     render() {
         const {name, today, isNewTodoError, newTodoErrorMessage,
-            isTodoCreated, todoCreatedMessage, todos} = this.state;
+            isTodoCreated, todoCreatedMessage, todos, overdueTodos} = this.state;
 
         const alertBox = (
             <Alert variant='warning'>
@@ -176,15 +196,26 @@ class TodoPage extends Component {
                 {isTodoCreated && todoToast}
                 <InputGroup className="mb-3">
                     <FormControl
-                    placeholder="What do you need to get done?"
-                    aria-label="What do you need to get done?"
-                    aria-describedby="basic-addon2"
-                    ref={this.newTodoRef}
-                    onKeyPress={(event) => {
-                        if (event.key === 'Enter') {
-                            this.handleAddTodo();
-                        }
-                    }}
+                        placeholder="What do you need to get done?"
+                        aria-label="What do you need to get done?"
+                        aria-describedby="basic-addon2"
+                        ref={this.newTodoRef}
+                        onKeyPress={(event) => {
+                            if (event.key === 'Enter') {
+                                this.handleAddTodo();
+                            }
+                        }}
+                    />
+                    <FormControl
+                        placeholder="When?"
+                        aria-label="When?"
+                        aria-describedby="basic-addon2"
+                        ref={this.newDateRef}
+                        onKeyPress={(event) => {
+                            if (event.key === 'Enter') {
+                                this.handleAddTodo();
+                            }
+                        }}
                     />
                     <InputGroup.Append>
                         <Button
@@ -196,12 +227,13 @@ class TodoPage extends Component {
                     </InputGroup.Append>
                 </InputGroup>
 
-                {todos.map((dateTodos) => {
-                    return (
-                        <Card style={{width: '600px'}}>
-                            <Card.Header>{dateTodos[0].dueDate}</Card.Header>
-                            {dateTodos.map((todoIter) => {
-                                console.log(todoIter);
+                {
+                    (overdueTodos.length !== 0)
+                    &&
+                    <div>
+                        <Card style={{width: '600px'}} bg='danger' text='white'>
+                            <Card.Header>Overdue</Card.Header>
+                            {overdueTodos.map((todoIter) => {
                                 return (
                                     <TodoItem
                                         completed={todoIter.completed}
@@ -209,10 +241,36 @@ class TodoPage extends Component {
                                         dueDate={todoIter.dueDate}
                                         id={todoIter.id}
                                         key={todoIter.id}
+                                        onChange={this.loadTodos}
                                     />
                                 )
                             })}
                         </Card>
+                        <br />
+                    </div>
+                }
+                {todos.map((dateTodos) => {
+                    return (
+                        <div>
+                            <Card style={{width: '600px'}}>
+                                <Card.Header>
+                                    {this.makePrettyDate(dateTodos[0].dueDate)}
+                                </Card.Header>
+                                {dateTodos.map((todoIter) => {
+                                    return (
+                                        <TodoItem
+                                            completed={todoIter.completed}
+                                            todoText={todoIter.todo}
+                                            dueDate={todoIter.dueDate}
+                                            id={todoIter.id}
+                                            key={todoIter.id}
+                                            onChange={this.loadTodos}
+                                        />
+                                    )
+                                })}
+                            </Card>
+                            <br />
+                        </div>
                     )
                 })}
             </div>
