@@ -178,8 +178,7 @@ class TodoPage extends Component {
                     textAlign: 'center',
                     position: 'absolute',
                     bottom: '10px',
-                    left: 0,
-                    right: 0,
+                    left: '50px',
                     margin: '0 auto',
 
                 }}>
@@ -188,7 +187,7 @@ class TodoPage extends Component {
         )
 
         return (
-            <div>
+            <div style={{width: '600px'}}>
                 <h1>Welcome, {name}</h1>
                 <h2>Today is: {today}</h2>
                 <hr />
